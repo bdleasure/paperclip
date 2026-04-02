@@ -339,10 +339,10 @@
       "breakpoints": true
     },
     {
-      "idx": 47,
+      "idx": 48,
       "version": "7",
       "when": 1774966800000,
-      "tag": "0047_cost_events_issue_idx",
+      "tag": "0048_cost_events_issue_idx",
       "breakpoints": true
     }
   ]
