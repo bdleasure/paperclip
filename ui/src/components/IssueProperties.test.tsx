@@ -342,6 +342,59 @@ describe("IssueProperties", () => {
     act(() => rerenderedRoot.unmount());
   });
 
+  it("shows publication-proof guidance for repo-backed issues", async () => {
+    mockProjectsApi.list.mockResolvedValue([
+      {
+        id: "project-1",
+        companyId: "company-1",
+        urlKey: "project-1",
+        goalId: null,
+        goalIds: [],
+        goals: [],
+        name: "Repo Project",
+        description: null,
+        status: "in_progress",
+        leadAgentId: null,
+        targetDate: null,
+        color: null,
+        env: null,
+        pauseReason: null,
+        pausedAt: null,
+        executionWorkspacePolicy: null,
+        codebase: {
+          workspaceId: "workspace-1",
+          repoUrl: null,
+          repoRef: null,
+          defaultRef: null,
+          repoName: null,
+          localFolder: "/data/brainroad",
+          managedFolder: "/tmp/managed",
+          effectiveLocalFolder: "/data/brainroad",
+          origin: "local_folder",
+        },
+        workspaces: [],
+        primaryWorkspace: null,
+        archivedAt: null,
+        createdAt: new Date("2026-04-06T12:00:00.000Z"),
+        updatedAt: new Date("2026-04-06T12:05:00.000Z"),
+      },
+    ]);
+
+    const root = renderProperties(container, {
+      issue: createIssue({ projectId: "project-1" }),
+      childIssues: [],
+      onAddSubIssue: vi.fn(),
+      onUpdate: vi.fn(),
+    });
+    await flush();
+
+    expect(container.textContent).toContain("Repo-backed lane proof");
+    expect(container.textContent).toContain("origin/main");
+    expect(container.textContent).toContain("git status --short");
+
+    act(() => root.unmount());
+  });
+
   it("shows a run review action after reviewers are configured and starts execution explicitly when clicked", async () => {
     const onUpdate = vi.fn();
     const root = renderProperties(container, {
