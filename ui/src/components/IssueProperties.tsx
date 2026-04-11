@@ -20,7 +20,7 @@ import { formatDate, cn, projectUrl } from "../lib/utils";
 import { timeAgo } from "../lib/timeAgo";
 import { Separator } from "@/components/ui/separator";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { User, Hexagon, ArrowUpRight, Tag, Plus, Trash2, GitBranch, FolderOpen, Copy, Check } from "lucide-react";
+import { User, Hexagon, ArrowUpRight, Tag, Plus, Trash2, GitBranch, FolderOpen, Copy, Check, AlertTriangle } from "lucide-react";
 import { AgentIcon } from "./AgentIconPicker";
 
 function TruncatedCopyable({ value, icon: Icon }: { value: string; icon: React.ComponentType<{ className?: string }> }) {
@@ -255,6 +255,7 @@ export function IssueProperties({
   const currentProject = issue.projectId
     ? orderedProjects.find((project) => project.id === issue.projectId) ?? null
     : null;
+  const repoBackedIssue = Boolean(currentProject?.codebase?.effectiveLocalFolder || issue.currentExecutionWorkspace?.cwd);
   const projectLink = (id: string | null) => {
     if (!id) return null;
     const project = projects?.find((p) => p.id === id) ?? null;
@@ -958,6 +959,27 @@ export function IssueProperties({
                 />
               </PropertyRow>
             )}
+          </div>
+        </>
+      ) : null}
+
+      {repoBackedIssue ? (
+        <>
+          <Separator />
+          <div className="rounded-lg border border-amber-500/25 bg-amber-500/5 px-3 py-2.5 text-xs text-muted-foreground">
+            <div className="flex items-start gap-2">
+              <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-amber-500" />
+              <div className="space-y-1">
+                <p className="font-medium text-foreground">Repo-backed lane proof</p>
+                <p>
+                  Do not treat a local commit hash as shipped proof. Closeout should include the repo path, changed files or routes, verification commands,
+                  <span className="font-mono"> git status --short </span>
+                  after the final publication step, and either a commit reachable on
+                  <span className="font-mono"> origin/main </span>
+                  , a PR URL, or an explicit remote branch state.
+                </p>
+              </div>
+            </div>
           </div>
         </>
       ) : null}
