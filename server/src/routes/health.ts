@@ -5,7 +5,7 @@ import { heartbeatRuns, instanceUserRoles, invites } from "@paperclipai/db";
 import type { DeploymentExposure, DeploymentMode } from "@paperclipai/shared";
 import { readPersistedDevServerStatus, toDevServerHealthStatus } from "../dev-server-status.js";
 import { instanceSettingsService } from "../services/instance-settings.js";
-import { serverVersion } from "../version.js";
+import { serverBuildInfo, serverRuntimeVersion, serverVersion } from "../version.js";
 
 export function healthRoutes(
   db?: Db,
@@ -25,7 +25,12 @@ export function healthRoutes(
 
   router.get("/", async (_req, res) => {
     if (!db) {
-      res.json({ status: "ok", version: serverVersion });
+      res.json({
+        status: "ok",
+        version: serverRuntimeVersion,
+        packageVersion: serverVersion,
+        build: serverBuildInfo,
+      });
       return;
     }
 
@@ -34,7 +39,9 @@ export function healthRoutes(
     } catch {
       res.status(503).json({
         status: "unhealthy",
-        version: serverVersion,
+        version: serverRuntimeVersion,
+        packageVersion: serverVersion,
+        build: serverBuildInfo,
         error: "database_unreachable",
       });
       return;
@@ -87,7 +94,9 @@ export function healthRoutes(
 
     res.json({
       status: "ok",
-      version: serverVersion,
+      version: serverRuntimeVersion,
+      packageVersion: serverVersion,
+      build: serverBuildInfo,
       deploymentMode: opts.deploymentMode,
       deploymentExposure: opts.deploymentExposure,
       authReady: opts.authReady,

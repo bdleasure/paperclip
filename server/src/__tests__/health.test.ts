@@ -2,7 +2,7 @@ import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import express from "express";
 import request from "supertest";
 import type { Db } from "@paperclipai/db";
-import { serverVersion } from "../version.js";
+import { serverBuildInfo, serverRuntimeVersion, serverVersion } from "../version.js";
 
 describe("GET /health", () => {
   beforeEach(() => {
@@ -22,7 +22,12 @@ describe("GET /health", () => {
 
     const res = await request(app).get("/health");
     expect(res.status).toBe(200);
-    expect(res.body).toEqual({ status: "ok", version: serverVersion });
+    expect(res.body).toEqual({
+      status: "ok",
+      version: serverRuntimeVersion,
+      packageVersion: serverVersion,
+      build: serverBuildInfo,
+    });
   });
 
   it("returns 200 when the database probe succeeds", async () => {
@@ -38,7 +43,12 @@ describe("GET /health", () => {
     const res = await request(app).get("/health");
 
     expect(res.status).toBe(200);
-    expect(res.body).toMatchObject({ status: "ok", version: serverVersion });
+    expect(res.body).toMatchObject({
+      status: "ok",
+      version: serverRuntimeVersion,
+      packageVersion: serverVersion,
+      build: serverBuildInfo,
+    });
   });
 
   it("returns 503 when the database probe fails", async () => {
@@ -56,7 +66,9 @@ describe("GET /health", () => {
     expect(res.status).toBe(503);
     expect(res.body).toEqual({
       status: "unhealthy",
-      version: serverVersion,
+      version: serverRuntimeVersion,
+      packageVersion: serverVersion,
+      build: serverBuildInfo,
       error: "database_unreachable",
     });
   });
