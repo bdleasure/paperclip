@@ -1,6 +1,7 @@
 import { existsSync, readFileSync } from "node:fs";
 import { resolvePaperclipConfigPath, resolvePaperclipEnvPath } from "./paths.js";
 import type { BindMode, DeploymentExposure, DeploymentMode } from "@paperclipai/shared";
+import { serverBuildInfo, serverRuntimeVersion, serverVersion } from "./version.js";
 
 import { parse as parseEnvFileContents } from "dotenv";
 
@@ -133,6 +134,10 @@ export function printStartupBanner(opts: StartupBannerOptions): void {
   const dbBackup = opts.databaseBackupEnabled
     ? `enabled ${color(`(every ${opts.databaseBackupIntervalMinutes}m, keep ${opts.databaseBackupRetentionDays}d)`, "dim")}`
     : color("disabled", "yellow");
+  const buildValue =
+    serverRuntimeVersion === serverVersion
+      ? serverRuntimeVersion
+      : `${serverRuntimeVersion} ${color(`(pkg ${serverVersion}, source ${serverBuildInfo.source})`, "dim")}`;
 
   const art = [
     color("██████╗  █████╗ ██████╗ ███████╗██████╗  ██████╗██╗     ██╗██████╗ ", "cyan"),
@@ -149,6 +154,7 @@ export function printStartupBanner(opts: StartupBannerOptions): void {
     color("  ───────────────────────────────────────────────────────", "blue"),
     row("Mode", `${dbMode}  |  ${uiMode}`),
     row("Deploy", `${opts.deploymentMode} (${opts.deploymentExposure})`),
+    row("Build", buildValue),
     row("Bind", `${opts.bind} ${color(`(${opts.host})`, "dim")}`),
     row("Auth", opts.authReady ? color("ready", "green") : color("not-ready", "yellow")),
     row("Server", portValue),
